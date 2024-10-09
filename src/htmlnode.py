@@ -73,13 +73,11 @@ class ParentNode(HTMLNode):
 
         if self.children is None:
             raise ValueError("`children` argument must have a value")
-        
+
         parent_props = self.props_to_html() or ""
-        for child in children:
-
-
-    
-
+        for child in self.children:
+            if isinstance(child, LeafNode):
+                ...
 
 
 if __name__ == "__main__":
