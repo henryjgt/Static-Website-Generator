@@ -65,19 +65,21 @@ class ParentNode(HTMLNode):
         children: Optional[list[Node]] = None,
         props: Optional[dict[str, str]] = None,
     ):
-        super().__init__(tag=tag, value=None, children=children, props=props)
-
-    def to_html(self):
         if self.tag is None:
             raise ValueError("`tag` argument must have a value")
 
         if self.children is None:
             raise ValueError("`children` argument must have a value")
 
+        super().__init__(tag=tag, value=None, children=children, props=props)
+
+    def to_html(self):
+        assert self.children
+
         parent_props = self.props_to_html() or ""
         for child in self.children:
             if isinstance(child, LeafNode):
-                ...
+                self.to_html()
 
 
 if __name__ == "__main__":
