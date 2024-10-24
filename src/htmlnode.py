@@ -2,10 +2,11 @@
 
 """Implements the HTMLNode class."""
 
-from typing import Optional
+from typing import Any, Iterator, Optional
 
 
 type Node = HTMLNode
+type Error = Any
 
 
 class HTMLNode:
@@ -15,71 +16,81 @@ class HTMLNode:
         value: Optional[str] = None,
         children: Optional[list[Node]] = None,
         props: Optional[dict[str, str]] = None,
-    ):
-        self.tag = tag
-        self.value = value
-        self.children = children
-        self.props = props
+    ) -> None:
+        self.tag: Optional[str] = tag
+        self.value: Optional[str] = value
+        self.children: Optional[list[Node]] = children
+        self.props: Optional[dict[str, str]] = props
 
-    def __repr__(self):
-        _name = type(self).__name__
-        _args = (f"{v!r}" for v in vars(self).values())
+    def __repr__(self) -> str:
+        _name: str = type(self).__name__
+        _args: Iterator[str] = (f"{v!r}" for v in vars(self).values())
         return f"{_name}({', '.join((_args))})"
 
-    def to_html(self):
+    def to_html(self) -> Error:
         raise NotImplementedError
 
-    def props_to_html(self):
+    def props_to_html(self) -> Optional[str]:
         if not self.props:
             return None
 
-        attrs = (f"{k}={v!r}" for k, v in self.props.items())
+        attrs: Iterator[str] = (f"{k}={v!r}" for k, v in self.props.items())
         return " ".join(("", *attrs))
 
 
 class LeafNode(HTMLNode):
+
+    err_missing_value: str = "LeafNode object must have `value` of type str"
+
     def __init__(
         self,
         tag: Optional[str] = None,
         value: Optional[str] = None,
         props: Optional[dict[str, str]] = None,
-    ):
+    ) -> None:
         super().__init__(tag=tag, value=value, children=None, props=props)
 
-    def to_html(self):
+    def to_html(self) -> str | Error:
         if self.value is None:
-            raise ValueError("`value` argument must have a value")
+            raise ValueError(self.err_missing_value)
 
         if not self.tag:
             return str(self.value)
 
-        props = self.props_to_html() or ""
-        rendered_html = f"<{self.tag}{props}>{self.value}</{self.tag}>"
+        props: str = self.props_to_html() or ""
+        rendered_html: str = f"<{self.tag}{props}>{self.value}</{self.tag}>"
         return rendered_html
 
 
 class ParentNode(HTMLNode):
+
+    err_missing_tag: str = "ParentNode object must have `tag` of type str"
+    err_missing_children: str = "ParentNode object must have child node(s)"
+
     def __init__(
         self,
         tag: Optional[str] = None,
         children: Optional[list[Node]] = None,
         props: Optional[dict[str, str]] = None,
-    ):
+    ) -> None:
         if self.tag is None:
-            raise ValueError("`tag` argument must have a value")
+            raise ValueError(self.err_missing_tag)
 
         if self.children is None:
-            raise ValueError("`children` argument must have a value")
+            raise ValueError(self.err_missing_children)
 
         super().__init__(tag=tag, value=None, children=children, props=props)
 
-    def to_html(self):
+    # validate arguments decorator
+    def to_html(self) -> str | Error:
         assert self.children
 
-        parent_props = self.props_to_html() or ""
+        parent_props: str = self.props_to_html() or ""
         for child in self.children:
             if isinstance(child, LeafNode):
                 self.to_html()
+
+        return str()
 
 
 if __name__ == "__main__":
