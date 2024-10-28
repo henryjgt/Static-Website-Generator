@@ -30,17 +30,16 @@ class HTMLNode:
     def to_html(self) -> Error:
         raise NotImplementedError
 
-    def props_to_html(self) -> Optional[str]:
+    def props_to_html(self) -> str:
         if not self.props:
-            return None
-
+            return ""
         attrs: Iterator[str] = (f"{k}={v!r}" for k, v in self.props.items())
-        return " ".join(("", *attrs))
+        return "" or " ".join(("", *attrs))
 
 
 class LeafNode(HTMLNode):
 
-    err_missing_value: str = "LeafNode object must have `value` of type str"
+    err_missing_value: str = "LeafNode object cannot have missing `value`"
 
     def __init__(
         self,
@@ -53,18 +52,16 @@ class LeafNode(HTMLNode):
     def to_html(self) -> str | Error:
         if self.value is None:
             raise ValueError(self.err_missing_value)
-
-        if not self.tag:
+        if self.tag is None:
             return str(self.value)
 
-        props: str = self.props_to_html() or ""
-        rendered_html: str = f"<{self.tag}{props}>{self.value}</{self.tag}>"
-        return rendered_html
+        _props: str = self.props_to_html()
+        return f"<{self.tag}{_props}>{self.value}</{self.tag}>"
 
 
 class ParentNode(HTMLNode):
 
-    err_missing_tag: str = "ParentNode object must have `tag` of type str"
+    err_missing_tag: str = "ParentNode object cannot have missing `tag`"
     err_missing_children: str = "ParentNode object must have child node(s)"
 
     def __init__(
@@ -73,24 +70,20 @@ class ParentNode(HTMLNode):
         children: Optional[list[Node]] = None,
         props: Optional[dict[str, str]] = None,
     ) -> None:
+        super().__init__(tag=tag, value=None, children=children, props=props)
+
+    def to_html(self) -> str | Error:
         if self.tag is None:
             raise ValueError(self.err_missing_tag)
-
         if self.children is None:
             raise ValueError(self.err_missing_children)
 
-        super().__init__(tag=tag, value=None, children=children, props=props)
-
-    # validate arguments decorator
-    def to_html(self) -> str | Error:
-        assert self.children
-
-        parent_props: str = self.props_to_html() or ""
+        _html: str = ""
         for child in self.children:
-            if isinstance(child, LeafNode):
-                self.to_html()
+            _html += child.to_html()
 
-        return str()
+        _props: str = self.props_to_html()
+        return f"<{self.tag}{_props}>{_html}</{self.tag}>"
 
 
 if __name__ == "__main__":
