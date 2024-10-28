@@ -18,3 +18,6 @@ class TextNode:
         _name = type(self).__name__
         _args = (f"{v!r}" for v in vars(self).values())
         return f"{_name}({', '.join((_args))})"
+
+
+def text_node_to_html_node(text_node): ...
