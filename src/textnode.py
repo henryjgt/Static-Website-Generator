@@ -2,22 +2,19 @@
 
 """Implements the TextNode class."""
 
-from typing import Optional
+from typing import Iterator, Optional
 
 
 class TextNode:
-    def __init__(self, text: str, text_type: str, url: Optional[str] = None):
-        self.text = text
-        self.text_type = text_type
-        self.url = url
+    def __init__(self, text: str, text_type: str, url: Optional[str] = None) -> None:
+        self.text: str = text
+        self.text_type: str = text_type
+        self.url: Optional[str] = url
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return vars(self) == vars(other)
 
-    def __repr__(self):
-        _name = type(self).__name__
-        _args = (f"{v!r}" for v in vars(self).values())
+    def __repr__(self) -> str:
+        _name: str = type(self).__name__
+        _args: Iterator[str] = (f"{v!r}" for v in vars(self).values())
         return f"{_name}({', '.join((_args))})"
-
-
-def text_node_to_html_node(text_node): ...

@@ -84,34 +84,3 @@ class ParentNode(HTMLNode):
 
         _props: str = self.props_to_html()
         return f"<{self.tag}{_props}>{_html}</{self.tag}>"
-
-
-if __name__ == "__main__":
-
-    vals = {
-        "tag": "<h1>",
-        "props": {"href": "https://www.google.com", "target": "_blank"},
-    }
-    hn = HTMLNode(**vals)
-    print(hn)
-    print(hn.props_to_html())
-
-    # vals = {
-    #     "tag": "<h1>",
-    #     "value": "This is fun.",
-    #     "children": [hn],
-    #     "props": {"href": "https://www.google.com", "target": "_blank"},
-    # }
-    # hn = HTMLNode(**vals)
-    # print(hn)
-    # print(hn.props_to_html())
-
-    # hn = HTMLNode(None, None, None, None)
-    # print(hn)
-    # print(hn.props_to_html())
-
-    # ln = LeafNode(None, None, None)
-    # print(ln)
-
-    ln = LeafNode("p", "This is a paragraph of text.")
-    print(ln.to_html())
