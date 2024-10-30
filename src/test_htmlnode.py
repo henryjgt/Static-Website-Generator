@@ -16,7 +16,7 @@ class TestHTMLNode(unittest.TestCase):
         )
         self.assertEqual(
             node.props_to_html(),
-            ' class="greeting" href="https://boot.dev"',
+            " class='greeting' href='https://boot.dev'",
         )
 
     def test_values(self):
@@ -50,7 +50,7 @@ class TestHTMLNode(unittest.TestCase):
         )
         self.assertEqual(
             node.__repr__(),
-            "HTMLNode(p, What a strange world, children: None, {'class': 'primary'})",
+            "HTMLNode('p', 'What a strange world', None, {'class': 'primary'})",
         )
 
     def test_to_html_no_children(self):

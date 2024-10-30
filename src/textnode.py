@@ -29,9 +29,11 @@ def tt_validation(f) -> Callable:
 class TextNode:
 
     @tt_validation
-    def __init__(self, text: str, text_type: str, url: Optional[str] = None) -> None:
+    def __init__(
+        self, text: str, text_type: TextType, url: Optional[str] = None
+    ) -> None:
         self.text: str = text
-        self.text_type: str = text_type
+        self.text_type: str = text_type.value
         self.url: Optional[str] = url
 
     def __eq__(self, other) -> bool:
@@ -56,13 +58,24 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode | NoReturn:
         case "CODE":
             return LeafNode(tag="code", value=text_node.text)
         case "LINK":
-            a_props: dict[str, Optional[str]] = {"href": text_node.url}
+            if text_node.url is None:
+                msg = "Invalid HTML: <a> tags must have an href attribute specified"
+                raise ValueError(msg)
+            a_props: dict[str, str] = {"href": text_node.url}
             return LeafNode(tag="a", value=text_node.text, props=a_props)
         case "IMAGE":
-            img_props: dict[str, Optional[str]] = {
+            if text_node.url is None:
+                msg = "Invalid HTML: <img> tags must have an src attribute specified"
+                raise ValueError(msg)
+            img_props: dict[str, str] = {
                 "src": text_node.url,
                 "alt": text_node.text,
             }
             return LeafNode(tag="img", value=None, props=img_props)
         case _:
             raise ValueError("Text is not a valid text type")
+
+
+if __name__ == "__main__":
+    tn = TextNode("hello world", TextType.BOLD)
+    print(tn)

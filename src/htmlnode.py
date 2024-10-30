@@ -14,12 +14,12 @@ class HTMLNode:
         tag: Optional[str] = None,
         value: Optional[str] = None,
         children: Optional[list[Node]] = None,
-        props: Optional[dict[str, Optional[str]]] = None,
+        props: Optional[dict[str, str]] = None,
     ) -> None:
         self.tag: Optional[str] = tag
         self.value: Optional[str] = value
         self.children: Optional[list[Node]] = children
-        self.props: Optional[dict[str, Optional[str]]] = props
+        self.props: Optional[dict[str, str]] = props
 
     def __repr__(self) -> str:
         _name: str = type(self).__name__
@@ -44,7 +44,7 @@ class LeafNode(HTMLNode):
         self,
         tag: Optional[str] = None,
         value: Optional[str] = None,
-        props: Optional[dict[str, Optional[str]]] = None,
+        props: Optional[dict[str, str]] = None,
     ) -> None:
         if value is None:
             value = ""
@@ -69,7 +69,7 @@ class ParentNode(HTMLNode):
         self,
         tag: Optional[str] = None,
         children: Optional[list[Node]] = None,
-        props: Optional[dict[str, Optional[str]]] = None,
+        props: Optional[dict[str, str]] = None,
     ) -> None:
         super().__init__(tag=tag, value=None, children=children, props=props)
 

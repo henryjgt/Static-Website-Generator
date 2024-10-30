@@ -31,7 +31,8 @@ class TestTextNode(unittest.TestCase):
     def test_repr(self):
         node = TextNode("This is a text node", TextType.TEXT, "https://www.boot.dev")
         self.assertEqual(
-            "TextNode(This is a text node, text, https://www.boot.dev)", repr(node)
+            "TextNode('This is a text node', 'TEXT', 'https://www.boot.dev')",
+            repr(node),
         )
 
 
