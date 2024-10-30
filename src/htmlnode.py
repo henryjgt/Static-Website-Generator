@@ -2,11 +2,10 @@
 
 """Implements the HTMLNode class."""
 
-from typing import Any, Iterator, Optional
+from typing import Iterator, NoReturn, Optional
 
 
 type Node = HTMLNode
-type Error = Any
 
 
 class HTMLNode:
@@ -15,19 +14,19 @@ class HTMLNode:
         tag: Optional[str] = None,
         value: Optional[str] = None,
         children: Optional[list[Node]] = None,
-        props: Optional[dict[str, str]] = None,
+        props: Optional[dict[str, Optional[str]]] = None,
     ) -> None:
         self.tag: Optional[str] = tag
         self.value: Optional[str] = value
         self.children: Optional[list[Node]] = children
-        self.props: Optional[dict[str, str]] = props
+        self.props: Optional[dict[str, Optional[str]]] = props
 
     def __repr__(self) -> str:
         _name: str = type(self).__name__
         _args: Iterator[str] = (f"{v!r}" for v in vars(self).values())
         return f"{_name}({', '.join((_args))})"
 
-    def to_html(self) -> Error:
+    def to_html(self) -> str | NoReturn:
         raise NotImplementedError
 
     def props_to_html(self) -> str:
@@ -45,11 +44,13 @@ class LeafNode(HTMLNode):
         self,
         tag: Optional[str] = None,
         value: Optional[str] = None,
-        props: Optional[dict[str, str]] = None,
+        props: Optional[dict[str, Optional[str]]] = None,
     ) -> None:
+        if value is None:
+            value = ""
         super().__init__(tag=tag, value=value, children=None, props=props)
 
-    def to_html(self) -> str | Error:
+    def to_html(self) -> str | NoReturn:
         if self.value is None:
             raise ValueError(self.err_missing_value)
         if self.tag is None:
@@ -68,11 +69,11 @@ class ParentNode(HTMLNode):
         self,
         tag: Optional[str] = None,
         children: Optional[list[Node]] = None,
-        props: Optional[dict[str, str]] = None,
+        props: Optional[dict[str, Optional[str]]] = None,
     ) -> None:
         super().__init__(tag=tag, value=None, children=children, props=props)
 
-    def to_html(self) -> str | Error:
+    def to_html(self) -> str | NoReturn:
         if self.tag is None:
             raise ValueError(self.err_missing_tag)
         if self.children is None:
