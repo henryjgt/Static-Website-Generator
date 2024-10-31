@@ -2,6 +2,7 @@
 
 """Unit tests for TextNode objects."""
 
+
 import unittest
 
 from textnode import TextNode, TextType, text_node_to_html_node

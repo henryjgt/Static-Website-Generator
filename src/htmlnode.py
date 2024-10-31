@@ -2,6 +2,7 @@
 
 """Implements the HTMLNode class."""
 
+
 from typing import Iterator, NoReturn, Optional
 
 
