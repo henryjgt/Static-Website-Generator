@@ -3,10 +3,10 @@
 """Implements the HTMLNode class."""
 
 
-from typing import Iterator, NoReturn, Optional
+from typing import Iterator, NoReturn, Optional, Sequence
 
 
-type Node = HTMLNode
+type Node = HTMLNode | LeafNode | ParentNode
 
 
 class HTMLNode:
@@ -14,12 +14,12 @@ class HTMLNode:
         self,
         tag: Optional[str] = None,
         value: Optional[str] = None,
-        children: Optional[list[Node]] = None,
+        children: Optional[Sequence[Node]] = None,
         props: Optional[dict[str, str]] = None,
     ) -> None:
         self.tag: Optional[str] = tag
         self.value: Optional[str] = value
-        self.children: Optional[list[Node]] = children
+        self.children: Optional[Sequence[Node]] = children
         self.props: Optional[dict[str, str]] = props
 
     def __repr__(self) -> str:
@@ -69,7 +69,7 @@ class ParentNode(HTMLNode):
     def __init__(
         self,
         tag: Optional[str] = None,
-        children: Optional[list[Node]] = None,
+        children: Optional[Sequence[Node]] = None,
         props: Optional[dict[str, str]] = None,
     ) -> None:
         super().__init__(tag=tag, value=None, children=children, props=props)

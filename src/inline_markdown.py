@@ -3,7 +3,6 @@
 """Functionality to parse raw markdown into a sequence of TextNode objects."""
 
 from enum import Enum
-from pprint import pprint
 import re
 from typing import Pattern
 
@@ -146,6 +145,7 @@ def text_to_textnodes(text) -> NodeList:
 
 
 if __name__ == "__main__":
+    from pprint import pprint
 
     node = TextNode(
         "This is text with `code block` words and a **bold** word", TextType.TEXT
