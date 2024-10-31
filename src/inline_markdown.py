@@ -3,6 +3,7 @@
 """Functionality to parse raw markdown into a sequence of TextNode objects."""
 
 from enum import Enum
+from pprint import pprint
 import re
 from typing import Pattern
 
@@ -46,6 +47,64 @@ def extract_markdown_links(text) -> list[tuple[str, str]]:
     return links
 
 
+def split_nodes_image(old_nodes: NodeList) -> NodeList:
+
+    inlined_nodes: NodeList = []
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT.value:
+            inlined_nodes.append(node)
+            continue
+
+        node_text: str = node.text
+        cached_start: int = 0
+        split_nodes: NodeList = []
+        for m in re.finditer(match_image, node_text):
+            if m.start() != cached_start:
+                text_node = TextNode(node_text[cached_start : m.start()], TextType.TEXT)
+                split_nodes.append(text_node)
+
+            image_node = TextNode(m.group("alt"), TextType.IMAGE, m.group("src"))
+            split_nodes.append(image_node)
+
+            cached_start: int = m.end()
+
+        if cached_start < len(node_text):
+            split_nodes.append(TextNode(node_text[cached_start:], TextType.TEXT))
+
+        inlined_nodes.extend(split_nodes)
+
+    return inlined_nodes
+
+
+def split_nodes_link(old_nodes: NodeList) -> NodeList:
+
+    inlined_nodes: NodeList = []
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT.value:
+            inlined_nodes.append(node)
+            continue
+
+        node_text: str = node.text
+        cached_start: int = 0
+        split_nodes: NodeList = []
+        for m in re.finditer(match_link, node_text):
+            if m.start() != cached_start:
+                text_node = TextNode(node_text[cached_start : m.start()], TextType.TEXT)
+                split_nodes.append(text_node)
+
+            image_node = TextNode(m.group("anchor"), TextType.LINK, m.group("src"))
+            split_nodes.append(image_node)
+
+            cached_start: int = m.end()
+
+        if cached_start < len(node_text):
+            split_nodes.append(TextNode(node_text[cached_start:], TextType.TEXT))
+
+        inlined_nodes.extend(split_nodes)
+
+    return inlined_nodes
+
+
 def split_nodes_delimiter(
     old_nodes: NodeList, delimiter: str, text_type: TextType
 ) -> NodeList:
@@ -74,69 +133,26 @@ def split_nodes_delimiter(
     return inlined_nodes
 
 
-def split_nodes_image(old_nodes: NodeList) -> NodeList:
+def text_to_textnodes(text) -> NodeList:
 
-    inlined_nodes: NodeList = []
-    for node in old_nodes:
-        if node.text_type != TextType.TEXT.value:
-            inlined_nodes.append(node)
-            continue
+    nodes: NodeList = [TextNode(text, TextType.TEXT)]
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
 
-        node_text: str = node.text
-        next_start: int = 0
-        split_nodes: NodeList = []
-        for m in re.finditer(match_image, node_text):
-            if m.start() != next_start:
-                text_node = TextNode(node_text[next_start : m.start()], TextType.TEXT)
-                split_nodes.append(text_node)
-
-            image_node = TextNode(m.group("alt"), TextType.IMAGE, m.group("src"))
-            split_nodes.append(image_node)
-
-            next_start: int = m.end()
-
-        if next_start < len(node_text):
-            split_nodes.append(TextNode(node_text[next_start:], TextType.TEXT))
-
-        inlined_nodes.extend(split_nodes)
-
-    return inlined_nodes
-
-
-def split_nodes_link(old_nodes: NodeList) -> NodeList:
-
-    inlined_nodes: NodeList = []
-    for node in old_nodes:
-        if node.text_type != TextType.TEXT.value:
-            inlined_nodes.append(node)
-            continue
-
-        node_text: str = node.text
-        next_start: int = 0
-        split_nodes: NodeList = []
-        for m in re.finditer(match_link, node_text):
-            if m.start() != next_start:
-                text_node = TextNode(node_text[next_start : m.start()], TextType.TEXT)
-                split_nodes.append(text_node)
-
-            image_node = TextNode(m.group("anchor"), TextType.LINK, m.group("src"))
-            split_nodes.append(image_node)
-
-            next_start: int = m.end()
-
-        if next_start < len(node_text):
-            split_nodes.append(TextNode(node_text[next_start:], TextType.TEXT))
-
-        inlined_nodes.extend(split_nodes)
-
-    return inlined_nodes
+    return nodes
 
 
 if __name__ == "__main__":
 
-    node = TextNode("This is text with a `code block` word", TextType.TEXT)
+    node = TextNode(
+        "This is text with `code block` words and a **bold** word", TextType.TEXT
+    )
     new_nodes: NodeList = split_nodes_delimiter([node], "`", TextType.CODE)
-    # print(new_nodes)
+    new_nodes: NodeList = split_nodes_delimiter(new_nodes, "**", TextType.BOLD)
+    # pprint(new_nodes)
     # print()
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,7 +162,7 @@ if __name__ == "__main__":
         TextType.TEXT,
     )
     new_nodes: NodeList = split_nodes_link([node])
-    # print(new_nodes)
+    # pprint(new_nodes)
     # print()
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -160,7 +176,14 @@ if __name__ == "__main__":
         TextType.TEXT,
     )
     new_nodes: NodeList = split_nodes_image([node])
-    # print(new_nodes)
+    # pprint(new_nodes)
+    # print()
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    input_text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+    tns: NodeList = text_to_textnodes(input_text)
+    # pprint(tns)
     # print()
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
