@@ -155,6 +155,4 @@ def copy_file(source: str, destination: str) -> None:
 
 
 if __name__ == "__main__":
-    from pprint import pprint
-
     main()
