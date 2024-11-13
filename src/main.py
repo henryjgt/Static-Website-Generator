@@ -14,9 +14,9 @@ import sys
 type Path = os.PathLike | pathlib.Path
 
 
-class Source:
+class Resources:
     # should be moved such that
-    # from config import Source
+    # from config import Resources
 
     _public: str = "./public"
     _static: str = "./static"
@@ -49,8 +49,8 @@ class Source:
 
 
 def main() -> None:
-    source = Source()
-    make_public(source.static, source.public)
+    resources = Resources()
+    make_public(resources.static, resources.public)
 
 
 def make_public(static_source: Path, public_source: Path) -> None:
