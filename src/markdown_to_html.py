@@ -6,7 +6,7 @@
 from enum import StrEnum, unique
 import re
 
-from htmlnode import Node, LeafNode, ParentNode
+from htmlnode import LeafNode, ParentNode
 from inline_markdown import text_to_textnodes
 from markdown_blocks import BlockType, markdown_to_blocks, block_to_block_type
 from textnode import TextNode, text_node_to_html_node
@@ -73,12 +73,14 @@ def paragraph_to_html_node(block: str) -> ParentNode:
 def quote_to_html_node(block: str) -> ParentNode:
     tag: str = BlockTag.QUOTE.value
 
-    formatted_block: str = ""
+    formatted_lines: list[str] = []
     for line in block.split("\n"):
         if not line.startswith(">"):
             raise ValueError("Invalid markdown: invalid quote block")
         if len(line) > 0:
-            formatted_block += line.lstrip("> ").strip() + " "
+            formatted_lines.append(line.lstrip("> ").strip())
+
+    formatted_block: str = " ".join(formatted_lines)
     children: list[LeafNode] = text_to_html_nodes(formatted_block)
 
     return ParentNode(tag=tag, children=children)
