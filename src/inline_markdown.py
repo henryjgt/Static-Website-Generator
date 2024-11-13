@@ -153,7 +153,7 @@ if __name__ == "__main__":
     new_nodes: NodeList = split_nodes_delimiter([node], "`", TextType.CODE)
     new_nodes: NodeList = split_nodes_delimiter(new_nodes, "**", TextType.BOLD)
     # pprint(new_nodes)
-    # print()
+    # pprint()
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     )
     new_nodes: NodeList = split_nodes_link([node])
     # pprint(new_nodes)
-    # print()
+    # pprint()
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -177,13 +177,13 @@ if __name__ == "__main__":
     )
     new_nodes: NodeList = split_nodes_image([node])
     # pprint(new_nodes)
-    # print()
+    # pprint()
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     input_text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
     tns: NodeList = text_to_textnodes(input_text)
     # pprint(tns)
-    # print()
+    # pprint()
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
