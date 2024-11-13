@@ -18,7 +18,7 @@ class Source:
     # should be moved such that
     # from config import Source
 
-    _public: str = "./dummy"
+    _public: str = "./public"
     _static: str = "./static"
 
     @property
@@ -49,10 +49,8 @@ class Source:
 
 
 def main() -> None:
-    sources = Source()
-    public_source = sources.public
-    static_source = sources.static
-    make_public(static_source, public_source)
+    source = Source()
+    make_public(source.static, source.public)
 
 
 def make_public(static_source: Path, public_source: Path) -> None:
@@ -97,16 +95,13 @@ def clean_start(public_dest: Path) -> bool:
         return False
 
 
-def directory_depth(directory: Path) -> int:
-    return len(list(os.walk(directory)))
-
-
 def list_directory(directory: str, filepaths: list[str] = []) -> list[str]:
 
     target_dir: str = str(pathlib.Path(directory).resolve())
     for node in os.listdir(target_dir):
+        node: str
         nodepath: str = os.path.join(target_dir, node)
-        if re.match(r".+\..+", node):
+        if is_file(node):
             filepaths.append(nodepath)
         else:
             filepaths.append(nodepath + "/")
@@ -132,12 +127,23 @@ def paths_to_create(
         new_path: str = os.path.join(dest, pathdiff)
         old_path: str = str(pathlib.Path(p).resolve())
 
-        if new_path.endswith("/"):
-            paths["dirs"].append((old_path, new_path))
-        else:
+        if is_file(new_path):
             paths["files"].append((old_path, new_path))
+        else:
+            paths["dirs"].append((old_path, new_path))
 
     return paths
+
+
+def directory_depth(directory: Path) -> int:
+    return len(list(os.walk(directory)))
+
+
+def is_file(filepath: str) -> bool:
+    filename: str = pathlib.Path(filepath).name
+    if re.match(r".+\..+", filename):
+        return True
+    return False
 
 
 def make_dir(directory: str) -> None:
@@ -149,4 +155,6 @@ def copy_file(source: str, destination: str) -> None:
 
 
 if __name__ == "__main__":
+    from pprint import pprint
+
     main()
