@@ -15,7 +15,7 @@ type Path = os.PathLike | pathlib.Path
 
 
 class Resources:
-    # should be moved such that
+    # TODO should be moved such that
     # from config import Resources
 
     _public: str = "./public"
@@ -70,14 +70,14 @@ def make_public(static_source: Path, public_source: Path) -> None:
     if dirs_to_create:
         for d in dirs_to_create:
             new_dir: str = d[1]
-            make_dir(new_dir)
+            make_dir(new_dir)  # TODO log the newly created directories
 
     files_to_copy: list[tuple[str, str]] | None = to_replicate.get("files")
     if files_to_copy:
         for file in files_to_copy:
             file_source: str = file[0]
             file_dest: str = file[1]
-            copy_file(file_source, file_dest)
+            copy_file(file_source, file_dest)  # TODO log the newly created files
 
 
 def clean_start(public_dest: Path) -> bool:
@@ -90,8 +90,7 @@ def clean_start(public_dest: Path) -> bool:
         msg = "Public directory cleanup assertion checks failed"
         sys.exit(msg)
         return False
-    except:
-        # TODO naked exception should be handled
+    except:  # TODO naked exception should be better handled
         return False
 
 
