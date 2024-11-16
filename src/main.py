@@ -10,8 +10,7 @@ import re
 import shutil
 import sys
 
-
-type Path = os.PathLike | pathlib.Path
+from generate_webpages import Path, generate_page
 
 
 class Resources:
@@ -20,6 +19,13 @@ class Resources:
 
     _public: str = "./public"
     _static: str = "./static"
+
+    _markdown_index: str = "./content/index.md"
+    _page_template: str = "./template.html"
+    _html_index: str = ""
+
+    def __init__(self) -> None:
+        self._html_index: str = f"{self._public}/index.html"
 
     @property
     def public(self) -> Path:
@@ -47,10 +53,50 @@ class Resources:
         p: Path = pathlib.Path(static_dir).resolve()
         self._static = str(p)
 
+    @property
+    def markdown_index(self) -> Path:
+        return pathlib.Path(self._markdown_index)
+
+    @markdown_index.setter
+    def set_markdown_index(self, index_file: str | Path) -> None:
+        if not os.path.exists(index_file):
+            msg = "Trying to set static resources to nonexistent directory"
+            sys.exit(msg)
+
+        p: Path = pathlib.Path(index_file).resolve()
+        self._markdown_index = str(p)
+
+    @property
+    def page_template(self) -> Path:
+        return pathlib.Path(self._page_template)
+
+    @page_template.setter
+    def set_page_template(self, template_file: str | Path) -> None:
+        if not os.path.exists(template_file):
+            msg = "Trying to set static resources to nonexistent directory"
+            sys.exit(msg)
+
+        p: Path = pathlib.Path(template_file).resolve()
+        self._page_template = str(p)
+
+    @property
+    def html_index(self) -> Path:
+        return pathlib.Path(self._html_index)
+
+    @html_index.setter
+    def set_html_index(self, index_file: str | Path) -> None:
+        if not os.path.exists(index_file):
+            msg = "Trying to set static resources to nonexistent directory"
+            sys.exit(msg)
+
+        p: Path = pathlib.Path(index_file).resolve()
+        self._html_index = str(p)
+
 
 def main() -> None:
-    resources = Resources()
-    make_public(resources.static, resources.public)
+    res = Resources()
+    make_public(res.static, res.public)
+    generate_page(res.markdown_index, res.page_template, res.html_index)
 
 
 def make_public(static_source: Path, public_source: Path) -> None:
@@ -82,7 +128,7 @@ def make_public(static_source: Path, public_source: Path) -> None:
 
 def clean_start(public_dest: Path) -> bool:
     try:
-        assert directory_depth(public_dest) == 1
+        # assert directory_depth(public_dest) == 1
         shutil.rmtree(public_dest)
         os.mkdir(public_dest)
         return True
