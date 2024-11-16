@@ -10,7 +10,7 @@ import re
 import shutil
 import sys
 
-from generate_webpages import Path, generate_page
+from generate_webpages import Path, generate_pages_recursive
 
 
 class Resources:
@@ -19,6 +19,7 @@ class Resources:
 
     _public: str = "./public"
     _static: str = "./static"
+    _content: str = "./content"
 
     _markdown_index: str = "./content/index.md"
     _page_template: str = "./template.html"
@@ -34,7 +35,7 @@ class Resources:
     @public.setter
     def set_public(self, public_dir: str | Path) -> None:
         if not os.path.exists(public_dir):
-            msg = "Trying to set public resources to nonexistent directory"
+            msg = "Trying to set public resources with nonexistent directory"
             sys.exit(msg)
 
         p: Path = pathlib.Path(public_dir).resolve()
@@ -47,11 +48,24 @@ class Resources:
     @static.setter
     def set_static(self, static_dir: str | Path) -> None:
         if not os.path.exists(static_dir):
-            msg = "Trying to set static resources to nonexistent directory"
+            msg = "Trying to set static resources with nonexistent directory"
             sys.exit(msg)
 
         p: Path = pathlib.Path(static_dir).resolve()
         self._static = str(p)
+
+    @property
+    def content(self) -> Path:
+        return pathlib.Path(self._content)
+
+    @content.setter
+    def set_content(self, content_dir: str | Path) -> None:
+        if not os.path.exists(content_dir):
+            msg = "Trying to set content resources with nonexistent directory"
+            sys.exit(msg)
+
+        p: Path = pathlib.Path(content_dir).resolve()
+        self._content = str(p)
 
     @property
     def markdown_index(self) -> Path:
@@ -60,8 +74,8 @@ class Resources:
     @markdown_index.setter
     def set_markdown_index(self, index_file: str | Path) -> None:
         if not os.path.exists(index_file):
-            msg = "Trying to set static resources to nonexistent directory"
-            sys.exit(msg)
+            msg: str = f"File {index_file} could not be found"
+            raise FileExistsError(msg)
 
         p: Path = pathlib.Path(index_file).resolve()
         self._markdown_index = str(p)
@@ -73,8 +87,8 @@ class Resources:
     @page_template.setter
     def set_page_template(self, template_file: str | Path) -> None:
         if not os.path.exists(template_file):
-            msg = "Trying to set static resources to nonexistent directory"
-            sys.exit(msg)
+            msg: str = f"File {template_file} could not be found"
+            raise FileExistsError(msg)
 
         p: Path = pathlib.Path(template_file).resolve()
         self._page_template = str(p)
@@ -86,8 +100,8 @@ class Resources:
     @html_index.setter
     def set_html_index(self, index_file: str | Path) -> None:
         if not os.path.exists(index_file):
-            msg = "Trying to set static resources to nonexistent directory"
-            sys.exit(msg)
+            msg: str = f"File {index_file} could not be found"
+            raise FileExistsError(msg)
 
         p: Path = pathlib.Path(index_file).resolve()
         self._html_index = str(p)
@@ -96,7 +110,8 @@ class Resources:
 def main() -> None:
     res = Resources()
     make_public(res.static, res.public)
-    generate_page(res.markdown_index, res.page_template, res.html_index)
+    # generate_page(res.markdown_index, res.page_template, res.html_index)
+    generate_pages_recursive(res.content, res.page_template, res.public)
 
 
 def make_public(static_source: Path, public_source: Path) -> None:
@@ -141,6 +156,7 @@ def clean_start(public_dest: Path) -> bool:
 
 
 def list_directory(directory: str, filepaths: list[str] = []) -> list[str]:
+    # TODO needs to go in tertiary file
 
     target_dir: str = str(pathlib.Path(directory).resolve())
     for node in os.listdir(target_dir):
@@ -158,6 +174,7 @@ def list_directory(directory: str, filepaths: list[str] = []) -> list[str]:
 def paths_to_create(
     source: str, destination: str, source_tree: list[str]
 ) -> dict[str, list[tuple[str, str]]]:
+    # TODO needs to go in tertiary file
 
     dest: str = str(pathlib.Path(destination).resolve())
     src: str = str(pathlib.Path(source).resolve())
@@ -181,10 +198,12 @@ def paths_to_create(
 
 
 def directory_depth(directory: Path) -> int:
+    # TODO needs to go in tertiary file
     return len(list(os.walk(directory)))
 
 
 def is_file(filepath: str) -> bool:
+    # TODO needs to go in tertiary file
     filename: str = pathlib.Path(filepath).name
     if re.match(r".+\..+", filename):
         return True
@@ -192,10 +211,12 @@ def is_file(filepath: str) -> bool:
 
 
 def make_dir(directory: str) -> None:
+    # TODO needs to go in tertiary file
     pathlib.Path(directory).mkdir(parents=True, exist_ok=True)
 
 
 def copy_file(source: str, destination: str) -> None:
+    # TODO needs to go in tertiary file
     shutil.copyfile(source, destination)
 
 
